@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  pull_request:
+    branches: master
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Install Deps
+      - uses: lukka/get-cmake@latest
+
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: Win32
+
+      # Build
+      - name: Run CMake
+        run: |
+          cmake -Bbuild -G"Visual Studio 17 2022" -AWin32
+          cmake --build build --config=Release
+
+      # Upload
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Output
+          path: build/Release/prof.dll
